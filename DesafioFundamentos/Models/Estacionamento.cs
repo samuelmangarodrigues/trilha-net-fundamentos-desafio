@@ -1,67 +1,131 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 namespace DesafioFundamentos.Models
 {
     public class Estacionamento
     {
-        private decimal precoInicial = 0;
-        private decimal precoPorHora = 0;
-        private List<string> veiculos = new List<string>();
+        public int PrecoInicial { get; set; }
+        public int PrecoPorHora { get; set; }
 
-        public Estacionamento(decimal precoInicial, decimal precoPorHora)
+        private List<Veiculo> todosVeiculos = new();
+
+        public Estacionamento(int precoInicial, int precoPorHora)
         {
-            this.precoInicial = precoInicial;
-            this.precoPorHora = precoPorHora;
+            PrecoInicial = precoInicial;
+            PrecoPorHora = precoPorHora;
         }
+
+
+
 
         public void AdicionarVeiculo()
         {
-            // TODO: Pedir para o usuário digitar uma placa (ReadLine) e adicionar na lista "veiculos"
-            // *IMPLEMENTE AQUI*
-            Console.WriteLine("Digite a placa do veículo para estacionar:");
+            Console.Clear();
+            Console.WriteLine("Digite a placa do veiculo\n");
+            string placaDoveiculo = Console.ReadLine();
+            Veiculo veiculo = new(placaDoveiculo);
+
+            todosVeiculos.Add(veiculo);
+            MenuSecundario();
         }
 
         public void RemoverVeiculo()
         {
-            Console.WriteLine("Digite a placa do veículo para remover:");
+            Console.WriteLine("Digite a placa do veiculo que quer remover:\n");
 
-            // Pedir para o usuário digitar a placa e armazenar na variável placa
-            // *IMPLEMENTE AQUI*
-            string placa = "";
+            string placaDoveiculo = Console.ReadLine();
 
-            // Verifica se o veículo existe
-            if (veiculos.Any(x => x.ToUpper() == placa.ToUpper()))
+            Veiculo veiculo = todosVeiculos.Find(v => string.Equals(v.NumeroDaPlaca, placaDoveiculo, StringComparison.OrdinalIgnoreCase));
+
+            VerificaSeOVeiculoExisteERemove(veiculo);
+
+        }
+
+        public void VerificaSeOVeiculoExisteERemove(Veiculo veiculo)
+        {
+            if (veiculo != null)
             {
-                Console.WriteLine("Digite a quantidade de horas que o veículo permaneceu estacionado:");
+                Console.WriteLine("Digite o tempo que seu carro ficou estacionado:\n");
 
-                // TODO: Pedir para o usuário digitar a quantidade de horas que o veículo permaneceu estacionado,
-                // TODO: Realizar o seguinte cálculo: "precoInicial + precoPorHora * horas" para a variável valorTotal                
-                // *IMPLEMENTE AQUI*
-                int horas = 0;
-                decimal valorTotal = 0; 
+                int tempoDeEstacionamento = int.Parse(Console.ReadLine());
 
-                // TODO: Remover a placa digitada da lista de veículos
-                // *IMPLEMENTE AQUI*
+                CalculaValorFinal(tempoDeEstacionamento);
 
-                Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: R$ {valorTotal}");
+                todosVeiculos.Remove(veiculo);
+
+                Console.WriteLine($"Veiculo de placa {veiculo.NumeroDaPlaca} removido com sucesso!\n");
+                Console.WriteLine("Aperte Enter para voltar ao menu");
+                Console.ReadLine();
+
+                MenuSecundario();
+
             }
-            else
+            else Console.WriteLine("Veiculo nao encontrado");
+        }
+
+
+        public void CalculaValorFinal(int tempoDeEstacionamento)
+        {
+
+
+            int valorFinal = tempoDeEstacionamento * PrecoPorHora;
+
+            Console.WriteLine($"\nValor à pagar :${valorFinal + PrecoInicial},00\n");
+
+        }
+
+
+        public void MenuSecundario()
+        {
+            Console.Clear();
+            Console.WriteLine("Escolha uma opcao:");
+            Console.WriteLine("1 - Adicionar carro");
+            Console.WriteLine("2 - Listar carros");
+            Console.WriteLine("3 - Remover carro");
+            Console.WriteLine("4 - Encerrar");
+            char opcao = char.Parse(Console.ReadLine());
+
+            VerificaOpcao(opcao);
+
+        }
+
+        public void VerificaOpcao(char opcao)
+        {
+
+            switch (opcao)
             {
-                Console.WriteLine("Desculpe, esse veículo não está estacionado aqui. Confira se digitou a placa corretamente");
+                case '1': AdicionarVeiculo(); break;
+                case '2': ListarCarrosEstacionados(); break;
+                case '3': RemoverVeiculo(); break;
+                case '4': Sair(); break;
+                default: MenuSecundario(); break;
             }
         }
 
-        public void ListarVeiculos()
+        public static void Sair()
         {
-            // Verifica se há veículos no estacionamento
-            if (veiculos.Any())
+            Console.WriteLine("Pressione qualquer tecla para sair.");
+            Console.ReadKey();
+            Environment.Exit(0);
+        }
+
+        public void ListarCarrosEstacionados()
+        {
+            Console.WriteLine("Veiculos estacionados:");
+
+            foreach (Veiculo veiculo in todosVeiculos)
             {
-                Console.WriteLine("Os veículos estacionados são:");
-                // TODO: Realizar um laço de repetição, exibindo os veículos estacionados
-                // *IMPLEMENTE AQUI*
+                Console.WriteLine(veiculo.NumeroDaPlaca);
             }
-            else
-            {
-                Console.WriteLine("Não há veículos estacionados.");
-            }
+
+            Console.WriteLine("\nAperte Enter para voltar ao menu");
+            Console.ReadLine();
+
+            MenuSecundario();
+
         }
     }
 }
